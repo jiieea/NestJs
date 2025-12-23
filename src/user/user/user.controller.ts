@@ -11,9 +11,30 @@ import {
 } from '@nestjs/common';
 import type { HttpRedirectResponse } from '@nestjs/common';
 import type { Response } from 'express';
+import { UserService } from './user.service';
+import { Connection } from '../connection/connection';
 
 @Controller('/api/users')
 export class UserController {
+  constructor(
+    private service: UserService,
+    private connection: Connection,
+  ) {}
+
+  @Get('/connection')
+  getConnection(): string {
+    return this.connection.getName();
+  }
+
+  @Get('/user')
+  async sayHello(@Query('name') name: string): Promise<string> {
+    const greeting = await new Promise<string>((resolve) => {
+      setTimeout(() => {
+        resolve(this.service.sayHello(name));
+      }, 100);
+    });
+    return greeting;
+  }
   @Get('/views/hello')
   hello(@Query('nama') nama: string, @Res() response: Response): void {
     response.render('index.html', {
@@ -53,18 +74,6 @@ export class UserController {
     return 'get method';
   }
 
-  @Get('/user')
-  async sayHello(
-    @Query('first_name') firstName: string,
-    @Query('last_name') lastName: string,
-  ): Promise<string> {
-    const greeting = await new Promise<string>((resolve) => {
-      setTimeout(() => {
-        resolve(`hello ${firstName} ${lastName}`);
-      }, 100);
-    });
-    return greeting;
-  }
   @Get('/:id')
   getById(@Param('id') id: string): string {
     return `hello ${id}`;

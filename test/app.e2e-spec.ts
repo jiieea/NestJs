@@ -20,6 +20,16 @@ describe('AppController (e2e)', () => {
     return request(app.getHttpServer())
       .get('/')
       .expect(200)
-      .expect('Hello World!');
+      .expect('hello world');
+  });
+
+  it('should can say hello', async () => {
+    const result = await request(app.getHttpServer())
+      .get('/api/users/user')
+      .query({
+        first_name: 'Sulthan',
+        last_name: 'Dzaky',
+      });
+    expect(result.status).toBe(200);
   });
 });
